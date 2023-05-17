@@ -46,12 +46,13 @@ for i in range(len(twist)):
     )
 
     # plot settings
-    ax1 = fig6a.add_subplot(3,3,i+1)
-    ax2 = fig6a.add_subplot(3,3,i+4)
-    ax3 = fig6a.add_subplot(3,3,i+7)
+    ax1 = fig6a.add_subplot(4,3,i+1)
+    ax2 = fig6a.add_subplot(4,3,i+4)
+    ax3 = fig6a.add_subplot(4,3,i+7)
+    ax4 = fig6a.add_subplot(4,3,i+10)
     ax11 = fig6b.add_subplot(3,3,i+1)
-    ax4 = fig6b.add_subplot(3,3,i+7)
-    ax5 = fig6b.add_subplot(3,3,i+4)
+    ax5 = fig6b.add_subplot(3,3,i+7)
+    ax6 = fig6b.add_subplot(3,3,i+4)
 
     ax1.set_xlim([-1.7,1.7]); ax1.set_ylim([-1.7, 1.7])
     ax1.set_aspect(1.0/ax1.get_data_ratio(), adjustable='box')
@@ -112,20 +113,35 @@ for i in range(len(twist)):
     phase_shifts = []
     for j in range(x.shape[1]):
         idx_max_pert = argrelextrema(x[:,j], np.greater)[0] 
+        idx_min_pert = argrelextrema(x[:,j], np.less)[0] 
         x_max_pert = x[idx_max_pert, j]
+        x_min_pert = x[idx_min_pert, j]
         t_max_pert = t[idx_max_pert]
         phase_shift = t_max_pert[-1] - t_max_ctrl[-1]
         phase_shifts.append(phase_shift)
+        # only for CT=3 plot period-amplitude correlations:
+        # amplitude defined as peak-to-trough distance,
+        # period defined as peak-to-peak distance
+        if j == 6:
+            peak_trough = x_max_pert[0:6] - x_min_pert[0:6] 
+            peak_peak = np.diff(t_max_pert)    
     phase_shifts = np.asarray(phase_shifts)
     phase_shifts[phase_shifts < -12] += 24
     phase_shifts[phase_shifts > 12] -= 24
 
-    ax3.axhline(y=0, linestyle='--', color='grey', lw=0.5)
-    ax3.plot(phase_perturbation, phase_shifts, 
-             'k-', markersize=2)
-    ax3.set_xlabel('circadian time CT'); ax3.set_ylabel('phase shift')
-    ax3.set_xticks([0,6,12,18,24]); ax3.set_yticks([-12,-6,0,6,12]) 
+    ax3.plot(peak_peak[1:6], peak_trough[1:6], '--', color='crimson')
+    ax3.plot(peak_peak[1:6], peak_trough[1:6], 'o', color='crimson')
+    ax3.set_xlabel('peak-to-peak distance (h)')
+    ax3.set_ylabel('peak-to-trough\ndistance (a.u.)')
+    ax3.set_xlim([23.0, 25.0])
     ax3.set_aspect(0.5/ax3.get_data_ratio(), adjustable='box')
+
+    ax4.axhline(y=0, linestyle='--', color='grey', lw=0.5)
+    ax4.plot(phase_perturbation, phase_shifts, 
+             'k-', markersize=2)
+    ax4.set_xlabel('circadian time CT'); ax4.set_ylabel('phase shift')
+    ax4.set_xticks([0,6,12,18,24]); ax4.set_yticks([-12,-6,0,6,12]) 
+    ax4.set_aspect(0.5/ax4.get_data_ratio(), adjustable='box')
 
     # solve a poincare object with zeitgeber input 
     zeitgeber_periods = np.arange(20,29,.1)
@@ -176,36 +192,36 @@ for i in range(len(twist)):
     phases1 = np.flip(phases1, axis=1)
 
     norm = mpl.colors.Normalize(vmin=1.,vmax=4.)
-    c = ax5.imshow(amplitudes1, origin='lower', aspect='auto',
+    c = ax6.imshow(amplitudes1, origin='lower', aspect='auto',
             cmap='plasma', norm=norm, zorder=3)    
     idxs_xlabels = [10,50,90]
-    ax5.set_xticks(idxs_xlabels)
+    ax6.set_xticks(idxs_xlabels)
     xtick_labs = Ts[np.asarray(idxs_xlabels)]
-    ax5.set_xticklabels([str(round(float(l), 2)) for l in xtick_labs])
-    ax5.set_xlabel('$T$ (h)')
+    ax6.set_xticklabels([str(round(float(l), 2)) for l in xtick_labs])
+    ax6.set_xlabel('$T$ (h)')
     idxs_ylabels = [0, 49, 99]
-    ax5.set_yticks(idxs_ylabels)
+    ax6.set_yticks(idxs_ylabels)
     ytick_labs = Fs[np.asarray(idxs_ylabels)]
-    ax5.set_yticklabels([str(round(float(l), 2)) for l in ytick_labs])    
-    ax5.set_ylabel('zeitgeber strength $F$')
+    ax6.set_yticklabels([str(round(float(l), 2)) for l in ytick_labs])    
+    ax6.set_ylabel('zeitg. strength $F$')
 
-    divider = make_axes_locatable(ax5)
+    divider = make_axes_locatable(ax6)
     cax = divider.append_axes('bottom', size='10%', pad=0.55)
     cbar = fig6b.colorbar(c, cax=cax, orientation='horizontal')
     cbar.set_label('rel. amplitude (a.u.)', labelpad=8.)       
 
     # resonance curve values
     F_idx = np.where(Fs == F_zg)[0][0]
-    ax4.plot(Ts, amplitudes1[F_idx, :],'k-', markersize=2)
-    ax4.set_xlabel('zeitgeber period (h)'); 
-    ax4.set_ylabel('rel. amplitude')
-    ax4.set_ylim([0.0,3.9])
-    ax4.set_aspect(0.5/ax4.get_data_ratio(), adjustable='box')
-    ax4.set_xlim([Ts[0], Ts[-1]])
-    ax4.set_xticks([20, 24, 28])
-    ax4.text(.05, 0.9, '$F={}$'.format(format(F_zg, '.2f')), 
-        ha='left', va='top', transform=ax4.transAxes)
-    ax4.set_aspect(0.5/ax4.get_data_ratio(), adjustable='box')
+    ax5.plot(Ts, amplitudes1[F_idx, :],'k-', markersize=2)
+    ax5.set_xlabel('zeitgeber period (h)'); 
+    ax5.set_ylabel('rel. amplitude')
+    ax5.set_ylim([0.0,3.9])
+    ax5.set_aspect(0.5/ax5.get_data_ratio(), adjustable='box')
+    ax5.set_xlim([Ts[0], Ts[-1]])
+    ax5.set_xticks([20, 24, 28])
+    ax5.text(.05, 0.9, '$F={}$'.format(format(F_zg, '.2f')), 
+        ha='left', va='top', transform=ax5.transAxes)
+    ax5.set_aspect(0.5/ax5.get_data_ratio(), adjustable='box')
 
 fig6a.subplots_adjust(top=0.95,
         bottom=0.07,

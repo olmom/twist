@@ -9,6 +9,7 @@ from scipy import stats
 import pandas as pd 
 from utils.goodwin import GonzeOscillator
 from utils.rhythmic_parameters import RhythmicParameters 
+from sklearn.linear_model import LinearRegression
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.size'] = '13'
 plt.rcParams['legend.fontsize'] = '12'
@@ -131,9 +132,10 @@ def annotate(data, **kws):
     r, p = stats.spearmanr(data['periods'], data['amplitudes'])
     signif = 'n.s.' if p>.05 else ('*' if (p<.05) and (p>.01) else\
                                    '**' if (p<.01) and (p>.001) else '***')
+    n = data['periods'].shape[0]
     ax = plt.gca()
-    ax.text(.05, .9, '$r={:.2f}$, {}'.format(r, signif),
-            transform=ax.transAxes, size=10)             
+    ax.text(.05, .9, '$r={:.2f}$, {}\n$n={}$'.format(r, signif, n),
+            transform=ax.transAxes, size=10)               
 
 g.map_dataframe(annotate)
 titles = ['$k_2$, $k_4$', '$k_4$, $k_6$']
@@ -156,73 +158,78 @@ g.fig.subplots_adjust(
 # 3. now change one parameter at a time: k2, k4, k6 individually
 import copy
 np.random.seed(230224)
-ratios = []
+
+# construct object to change k2, k4, k6
 myoscillator = GonzeOscillator()
-
-# construct objects to change k2, k4, k6
-obj1, obj2, obj3 = copy.copy(myoscillator), \
-    copy.copy(myoscillator), copy.copy(myoscillator)
-obj1.k2 = np.random.uniform(obj1.k2*(1-frac_variation), 
-                            obj1.k2*(1+frac_variation), n_oscs)
-obj2.k4 = np.random.uniform(obj2.k4*(1-frac_variation), 
-                            obj2.k4*(1+frac_variation), n_oscs)
-obj3.k6 = np.random.uniform(obj3.k6*(1-frac_variation), 
-                            obj3.k6*(1+frac_variation), n_oscs)
-
-myobjects = [obj1, obj2, obj3]
+obj = copy.copy(myoscillator)
+parameters = ['k2', 'k4', 'k6']
+par_value = [obj.k2, obj.k4, obj.k6]
 
 ax3 = g.fig.add_subplot(133)
 colors = ['#1B9E77', '#D95F02', '#7570B3']
-for ob in range(len(myobjects)):
-    obj = myobjects[ob]
+
+for p in range(len(parameters)):
+    # load data from bifurcation analyses, 
+    # since it contains period and amp info
+    data = pd.read_csv("./results/bifurcations/gonze_{}_allinfo.dat".format(
+        parameters[p]), sep=" ", header=None)
     
-    # solve ODEs and remove transients
-    sol = odeint(obj.dynamics, y0, t)
-    sol_LC = sol[-int(40*24/dt):, :]
-    t_LC = t[-int(40*24/dt):]
+    # dataframe with max, min, period values
+    subset = data.loc[data[0]==3]
+    k, max_x, min_x = np.asarray(subset[3]), np.asarray(subset[6]), \
+        np.asarray(subset[9])
+    periods = np.asarray(subset[5])
 
-    x = sol_LC[:,0::3]
-    y = sol_LC[:,1::3]
-    z = sol_LC[:,2::3]
+    # filter out deg values (k) that are within +-10% of the default value
+    k_filt = k[(k >= par_value[p]*(1-frac_variation))  &  \
+               (k <= par_value[p]*(1+frac_variation))]
+    max_x = max_x[(k >= par_value[p]*(1-frac_variation)) & \
+                  (k <= par_value[p]*(1+frac_variation))]
+    min_x = min_x[(k >= par_value[p]*(1-frac_variation)) & \
+                  (k <= par_value[p]*(1+frac_variation))]
+    periods = periods[(k >= par_value[p]*(1-frac_variation)) & \
+                      (k <= par_value[p]*(1+frac_variation))]
 
-    # normalize absolute values to their means & center around 0
-    x_norm = x/x.mean(axis=0) - 1
-    y_norm = y/y.mean(axis=0) - 1
-    z_norm = z/z.mean(axis=0) - 1
+    # dataframe with unstable FP (~ mean of oscillation)
+    # but the parameter values in this df != parameter values 
+    # from previous dataframe -> to calculate amp we have to do regression
+    subset2=data.loc[data[0]==2]
+    k2, unstable_FP = subset2[3].values[1:], subset2[6].values[1:]
+    k2_filt = k2[(k2 >= par_value[p]*(1-frac_variation))  &  \
+                 (k2 <= par_value[p]*(1+frac_variation))]
+    unstable_FP= unstable_FP[(k2 >= par_value[p]*(1-frac_variation))  &  \
+                             (k2 <= par_value[p]*(1+frac_variation))]
 
-    # compute periods, amplitudes, magnitudes
-    amps, periods = [], []
-    for osc in range(n_oscs):
-        amp = RhythmicParameters().determine_amplitude_singleosc_peaktrough(
-            t_LC, x_norm[:,osc])
-        per = RhythmicParameters().determine_period_singleosc(
-            t_LC, x_norm[:,osc])    
-        amps.append(amp); periods.append(per)
-    amps, periods = np.asarray(amps), np.asarray(periods)
+    # do linear regression on the curve unstable_FP = f(k2_filt)
+    x, y = k2_filt.reshape((-1,1)), unstable_FP
+    model = LinearRegression().fit(x, y)
+    slope, intercept = model.coef_, model.intercept_
+    r_sq = model.score(x, y)
+    UFP_pred = model.predict(k_filt.reshape((-1,1)))
     
-    # remove weakly damped oscillators (those whose peak-to-trough
-    # amplitude decreases above a threshold over time)
-    first_peak_trough = [amps[o][0][0] for o in range(n_oscs)] 
-    last_peak_trough = [amps[o][0][-1] for o in range(n_oscs)] 
-    ratio = np.asarray(last_peak_trough)/np.asarray(first_peak_trough)
-    amps = np.asarray([amps[o][1] for o in range(n_oscs)] )
-    amps = amps[ratio > amplitude_threshold/100]
-    amplitudes=amps
-    periods = periods[ratio > amplitude_threshold/100]
+    # study amplitude-period correlation in an ensemble of 100 oscillators
+    # pick 100 random values from the arrays
+    idxs = np.random.randint(0, len(k_filt), n_oscs)
+    k_filt = k_filt[idxs]
+    max_x = max_x[idxs]
+    min_x = min_x[idxs]
+    periods = periods[idxs]
+    mean = UFP_pred[idxs]
+    amplitudes = (max_x - min_x)/mean
 
-    # plot period vs. amplitude correlation
-    label = '$k_2$' if (ob == 0) else ('$k_4$' if (ob==1) else '$k_6$')
+    n = amplitudes[amplitudes>.1].shape[0]
+    label = '$k_2$\n$(n={})$'.format(n) if (p == 0) else\
+          ('$k_4$\n$(n={})$'.format(n) if (p == 1) else \
+           '$k_6$\n$(n={})$'.format(n))
     x_limits = [22, 26]
     y_limits = [0, 1.9]
     ax3.set_xlabel('period (h)') 
-    ax3.plot(periods[amplitudes>.1], amplitudes[amplitudes>.1], 
-             'o', color=colors[ob],
-            label=label, markersize=4, alpha=0.6)
+    ax3.plot(periods[amplitudes>.1], amplitudes[amplitudes>.1], 'o', 
+             label=label, c=colors[p], markersize=4, alpha=0.6)
     ax3.legend(loc='upper center', bbox_to_anchor=(0.5, 1.25), 
-              framealpha=0, ncol=3, columnspacing=.4, handletextpad=.03)
+              framealpha=0, ncol=3, columnspacing=.4, handletextpad=.03) 
     ax3.set_ylim(y_limits); ax3.set_xlim(x_limits)
     ax3.set_aspect(1.0/ax3.get_data_ratio(), adjustable='box')
-
 
 
 plt.show()
