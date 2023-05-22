@@ -96,11 +96,13 @@ for p in range(len(param_to_change)):
         amp_default = amps[np.abs(k_filt - par_value[p]).argmin()]
         print(k_filt_round, amp_default)
         amp_ratio = amps/amp_default
+
+        title_plot = '$V_D$' if param_to_change[p] == "V_D" else "$\gamma_P$"
     
         ax = fig5.add_subplot(2, 2, (2*p)+1)    
         ax.plot(periods,amp_ratio ,'o', c=colors[i], alpha=.5, markersize=5, label=labels[i])
         ax.set_xlabel('period (h)'); ax.set_ylabel('ratio of rel. amplitude\nto default amplitude')
-        ax.set_title('twist for variations in ${}$'.format(param_to_change[p]))
+        ax.set_title('twist for variations in {}'.format(title_plot))
         ax.set_aspect(1.0/ax.get_data_ratio(), adjustable='box')
         if p == 0:
             ax.set_xlim([22.2,28.2]); 
@@ -194,4 +196,4 @@ fig5.subplots_adjust(
 isExist = os.path.exists('./figures/')
 if not isExist:  
     os.makedirs('./figures/')
-fig5.savefig('./figures/fig5.pdf', format='pdf')    
+#fig5.savefig('./figures/fig5.pdf', format='pdf')    

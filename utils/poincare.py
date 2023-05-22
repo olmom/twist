@@ -107,18 +107,18 @@ class PoincareOscillator:
         
         return f
 
-    def isochrones (self, r_latent):
+    def isochrones (self, r):
         """
         define isochrones as in Winfree's book:
         Winfree, AT: The Geometry of Biological Time (1980, Springer)
         (see Materials & Methods in paper for analytical calculation)
         """
-        phi_isoch = np.arange(0, 2*np.pi + np.pi/4, np.pi/4) #every 45deg
+        phi_latent = np.arange(0, 2*np.pi, np.pi/4) #every 45deg
 
-        phi_latent = []
-        for i in phi_isoch: #iterate over the different r
-            phi_lat = i - self.eps/self.lam*np.log(r_latent)
-            phi_latent.append(phi_lat)
-        phi_latent = np.asarray(phi_latent)
+        phi_isoch = []
+        for i in phi_latent: #iterate over the different latent phases
+            phi_iso = self.eps/self.lam*np.log(r) - i
+            phi_isoch.append(phi_iso)
+        phi_isoch = np.asarray(phi_isoch)
 
-        return phi_latent
+        return phi_isoch

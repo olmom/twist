@@ -62,15 +62,14 @@ for i in range(len(twist)):
     ax11.set_title('twist $\epsilon={}$'.format(format(twist[i], '.2f')))
 
     # define and plot isochrones
-    r_latent   = np.arange(.00001, 3, .001)
-    phi_latent = poincare_obj.isochrones(r_latent)
-
-    x_latent = r_latent*np.cos(phi_latent)
-    y_latent = r_latent*np.sin(phi_latent)
-    
-    for j in range(len(x_latent)):
-        ax1.plot(x_latent[j], y_latent[j], c='silver')
-        ax11.plot(x_latent[j], y_latent[j], c='silver')
+    r_isochrones = np.arange(.001, 3, .001)
+    phi_isochrones = poincare_obj.isochrones(r_isochrones)
+    for isoc in range(len(phi_isochrones)):
+        r_isoc, phi_isoc = r_isochrones, phi_isochrones[isoc]
+        x_isoc = r_isoc * np.cos(phi_isoc)
+        y_isoc = r_isoc * np.sin(phi_isoc)
+        ax1.plot(x_isoc, y_isoc, c='silver')
+        ax11.plot(x_isoc, y_isoc, c='silver')
     ax1.plot(0,0,color='k', marker='o',markersize=5)
     ax1.set_xlabel('$x$'); ax1.set_ylabel('$y$')
     ax11.plot(0,0,color='k', marker='o',markersize=5)
@@ -264,16 +263,15 @@ for i in range(len(amplitude_rr)):
     ax1.set_aspect(1.0/ax1.get_data_ratio(), adjustable='box')
 
     # isochrones
-    r_latent   = np.arange(.00001, 3, .001)
-    phi_latent = poincare_obj.isochrones(r_latent)
-
-    x_latent = r_latent*np.cos(phi_latent)
-    y_latent = r_latent*np.sin(phi_latent)
-    
-    for j in range(len(x_latent)):
-        ax1.plot(x_latent[j], y_latent[j], c='silver')
+    r_isochrones = np.arange(.001, 3, .001)
+    phi_isochrones = poincare_obj.isochrones(r_isochrones)
+    for isoc in range(len(phi_isochrones)):
+        r_isoc, phi_isoc = r_isochrones, phi_isochrones[isoc]
+        x_isoc = r_isoc * np.cos(phi_isoc)
+        y_isoc = r_isoc * np.sin(phi_isoc)
+        ax1.plot(x_isoc, y_isoc, c='silver')
     ax1.plot(0,0,color='k', marker='o',markersize=5)
-    ax1.set_xlabel('$x$'); ax1.set_ylabel('y')   
+    ax1.set_xlabel('$x$'); ax1.set_ylabel('$y$')
 
     # Poincare object unperturbed and perturbed
     sol_ctrl = odeint(poincare_obj.dynamics_cartesian, [1,0], t)
