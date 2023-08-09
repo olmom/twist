@@ -33,8 +33,8 @@ Ts = np.arange(19., 29.1, 0.1)
 Fs = np.arange(0., 0.10, 0.001)
 
 # plot results
-fig6a = plt.figure(figsize = (11, 7)) #interaction with pulse-like perturbations
-fig6b = plt.figure(figsize = (11, 7)) #interaction with periodic inputs
+fig7a = plt.figure(figsize = (11, 7)) #interaction with pulse-like perturbations
+fig7b = plt.figure(figsize = (11, 7)) #interaction with periodic inputs
 
 for i in range(len(twist)):
     # construct Poincare Oscillator
@@ -46,13 +46,13 @@ for i in range(len(twist)):
     )
 
     # plot settings
-    ax1 = fig6a.add_subplot(4,3,i+1)
-    ax2 = fig6a.add_subplot(4,3,i+4)
-    ax3 = fig6a.add_subplot(4,3,i+7)
-    ax4 = fig6a.add_subplot(4,3,i+10)
-    ax11 = fig6b.add_subplot(3,3,i+1)
-    ax5 = fig6b.add_subplot(3,3,i+7)
-    ax6 = fig6b.add_subplot(3,3,i+4)
+    ax1 = fig7a.add_subplot(4,3,i+1)
+    ax2 = fig7a.add_subplot(4,3,i+4)
+    ax3 = fig7a.add_subplot(4,3,i+7)
+    ax4 = fig7a.add_subplot(4,3,i+10)
+    ax11 = fig7b.add_subplot(3,3,i+1)
+    ax5 = fig7b.add_subplot(3,3,i+7)
+    ax6 = fig7b.add_subplot(3,3,i+4)
 
     ax1.set_xlim([-1.7,1.7]); ax1.set_ylim([-1.7, 1.7])
     ax1.set_aspect(1.0/ax1.get_data_ratio(), adjustable='box')
@@ -206,7 +206,7 @@ for i in range(len(twist)):
 
     divider = make_axes_locatable(ax6)
     cax = divider.append_axes('bottom', size='10%', pad=0.55)
-    cbar = fig6b.colorbar(c, cax=cax, orientation='horizontal')
+    cbar = fig7b.colorbar(c, cax=cax, orientation='horizontal')
     cbar.set_label('rel. amplitude (a.u.)', labelpad=8.)       
 
     # resonance curve values
@@ -222,13 +222,13 @@ for i in range(len(twist)):
         ha='left', va='top', transform=ax5.transAxes)
     ax5.set_aspect(0.5/ax5.get_data_ratio(), adjustable='box')
 
-fig6a.subplots_adjust(top=0.95,
+fig7a.subplots_adjust(top=0.95,
         bottom=0.07,
         left=0.10,
         right=0.9,
         hspace=0.185,
         wspace=0.8)
-fig6b.subplots_adjust(top=0.95,
+fig7b.subplots_adjust(top=0.95,
         bottom=0.07,
         left=0.10,
         right=0.9,
@@ -246,7 +246,7 @@ pulse = .7
 #####################################################
 
 t = np.arange(0, total_days*24, dt)
-suppfig3 = plt.figure(figsize=(11,6))
+fig8 = plt.figure(figsize=(11,6))
 
 for i in range(len(amplitude_rr)):
      # construct Poincare Oscillator
@@ -257,8 +257,8 @@ for i in range(len(amplitude_rr)):
         tau = 24
     )   
 
-    ax1 = suppfig3.add_subplot(2,3,i+1) #phase spaces
-    ax2 = suppfig3.add_subplot(2,3,i+4) 
+    ax1 = fig8.add_subplot(2,3,i+1) #phase spaces
+    ax2 = fig8.add_subplot(2,3,i+4) 
     ax1.set_xlim([-1.6,1.6]); ax1.set_ylim([-1.6, 1.6])
     ax1.set_aspect(1.0/ax1.get_data_ratio(), adjustable='box')
 
@@ -281,7 +281,7 @@ for i in range(len(amplitude_rr)):
     ax1.plot(sol_pert[:,0], sol_pert[:,1],c='crimson',lw=1.5)
     ax1.plot(sol_ctrl[:,0], sol_ctrl[:,1],c='k',lw=1)
     ax1.set_xlabel('$x$'); ax1.set_ylabel('$y$')
-    ax1.set_title('$\lambda={}$,\ntwist$={}$'.format(
+    ax1.set_title('$\lambda={}$,\n$\epsilon={} $'.format(
         format(amplitude_rr[i], '.2f'), format(twist, '.2f')))
 
     # PRC also affected by lambda
@@ -311,12 +311,12 @@ for i in range(len(amplitude_rr)):
     ax2.axhline(y=0, linestyle='--', color='grey', lw=0.5)
     ax2.plot(phase_perturbation, phase_shifts, 
              'k-', markersize=2)
-    ax2.set_xlabel('circadian time CT'); ax2.set_ylabel('phase shift')
+    ax2.set_xlabel('circadian time CT'); ax2.set_ylabel('phase shift (h)')
     ax2.set_xticks([0,6,12,18,24]); ax2.set_yticks([-12,-6,0,6,12]) 
     ax2.set_aspect(0.75/ax2.get_data_ratio(), adjustable='box')
 
 
-suppfig3.subplots_adjust(top=0.88,
+fig8.subplots_adjust(top=0.88,
         bottom=0.11,
         left=0.11,
         right=0.9,
@@ -346,10 +346,10 @@ y0 = np.tile([1,0], n_oscs)
 
 colors = ['darkgray', 'royalblue']
 
-suppfig2 = plt.figure(figsize=(11,3.5))
-suppfig2.suptitle('period=${}$h, $\lambda={}$h-1'.format(period,amplitude_rr) + \
+suppfig1 = plt.figure(figsize=(11,3.5))
+suppfig1.suptitle('period=${}$h, $\lambda={}$h-1'.format(period,amplitude_rr) + \
              ', turning on ZG: T={}h, F={}'.format(T_zg, F_zg))
-ax = suppfig2.add_subplot(111)
+ax = suppfig1.add_subplot(111)
 ax.axvline(x=t[int(len(t)/5)]/24, color='black', lw=.5, linestyle='dashed')
 
 # object for timeseries without and with zeitgeber
@@ -379,7 +379,7 @@ ax.set_ylabel('$x$ concentration')
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 
-suppfig2.subplots_adjust(
+suppfig1.subplots_adjust(
     top=0.88,
     bottom=0.135,
     left=0.075,
@@ -394,7 +394,7 @@ suppfig2.subplots_adjust(
 isExist = os.path.exists('./figures/')
 if not isExist:  
     os.makedirs('./figures/')
-#fig6a.savefig('./figures/fig6a.pdf', format='pdf')
-#fig6b.savefig('./figures/fig6b.pdf', format='pdf')
-#suppfig2.savefig('./figures/suppfig2.pdf', format='pdf') 
-#suppfig3.savefig('./figures/suppfig3.pdf', format='pdf')
+#fig7a.savefig('./figures/fig7a.pdf', format='pdf')
+#fig7b.savefig('./figures/fig7b.pdf', format='pdf')
+#suppfig1.savefig('./figures/suppfig1.pdf', format='pdf') 
+#fig8.savefig('./figures/fig8.pdf', format='pdf')

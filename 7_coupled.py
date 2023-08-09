@@ -55,16 +55,16 @@ for c in combinations:
     periods.append(per); amplitudes.append(amp)
     periods2.append(per2); amplitudes2.append(amp2)
     
-fig7 = plt.figure(figsize=(11,4))
-suppfig4 = plt.figure(figsize=(11,7))
-suppfig5 = plt.figure(figsize=(11,4))
+fig9 = plt.figure(figsize=(11,4))
+suppfig2 = plt.figure(figsize=(11,7))
+suppfig3 = plt.figure(figsize=(11,4))
 colors = plt.cm.Dark2_r(np.linspace(0,1,len(twist_values)))
 alphas = [1, .25, .25, .25, .25, .25, 1]
 
-ax1 = fig7.add_subplot(121)
-axs4_4 = suppfig4.add_subplot(212)
-axs5_1 = suppfig5.add_subplot(121)
-axs5_2 = suppfig5.add_subplot(122)
+ax1 = fig9.add_subplot(121)
+axs4_4 = suppfig2.add_subplot(212)
+axs5_1 = suppfig3.add_subplot(121)
+axs5_2 = suppfig3.add_subplot(122)
 
 for i in range(len(twist_values)):
     tw = round(twist_values[i], 2)
@@ -115,10 +115,10 @@ t = np.arange(0, total_days*24, dt)
 n_oscs = len(twist)
 y0 = np.tile([1,0], n_oscs)   
 
-axs4_1 = suppfig4.add_subplot(231)
-axs4_2 = suppfig4.add_subplot(232)
-axs4_3 = suppfig4.add_subplot(233)
-ax2 = fig7.add_subplot(122)
+axs4_1 = suppfig2.add_subplot(231)
+axs4_2 = suppfig2.add_subplot(232)
+axs4_3 = suppfig2.add_subplot(233)
+ax2 = fig9.add_subplot(122)
 ax2.set_title('turning on mean field coupling at K=${}$'.format(K_coup))
 ax2.axvline(x=t[int(len(t)/5)]/24, color='black', lw=.5, linestyle='dashed')
 
@@ -195,7 +195,7 @@ axs4_3.set_aspect(0.5/axs4_3.get_data_ratio(), adjustable='box')
 axs4_1.set_ylim([-2.2,2.2]); axs4_2.set_ylim([-2.2,2.2])
 axs4_3.set_ylim([-2.2,2.2]); ax2.set_ylim([-2.2,2.2])
 
-fig7.subplots_adjust(
+fig9.subplots_adjust(
     top=0.945,
     bottom=0.150,
     left=0.055,
@@ -204,7 +204,7 @@ fig7.subplots_adjust(
     wspace=0.255
 )
 
-suppfig4.subplots_adjust(
+suppfig2.subplots_adjust(
     top=0.88,
     bottom=0.11,
     left=0.11,
@@ -212,7 +212,7 @@ suppfig4.subplots_adjust(
     hspace=0.2,
     wspace=0.35
 )
-suppfig5.subplots_adjust(
+suppfig3.subplots_adjust(
     top=0.8,
     bottom=0.345,
     left=0.11,
@@ -235,10 +235,10 @@ t = np.arange(0, total_days*24, dt)
 n_oscs = len(twist)
 y0 = np.tile([1,0], n_oscs)   
 
-suppfig6 = plt.figure(figsize=(11,7))
-suppfig6.suptitle('period=${}$h, $\lambda={}$h-1'.format(period,amplitude_rr) + \
+suppfig4 = plt.figure(figsize=(11,7))
+suppfig4.suptitle('period=${}$h, $\lambda={}$h-1'.format(period,amplitude_rr) + \
                   ', turning on K at Kc={}'.format(K_coup))
-ax = suppfig6.add_subplot(211)
+ax = suppfig4.add_subplot(211)
 ax.axvline(x=t[int(len(t)/5)]/24, color='black', lw=.5, linestyle='dashed')
 colors2 = ['#736EB3', '#D95E00', 'limegreen'] 
 lws = [1.5, 1.5, 2.0]
@@ -267,7 +267,7 @@ for o in range(len(twist)):
     ax.plot(t[int(len(t)/5):]/24, x_osc[int(len(t)/5):], c=colors2[o], 
             label='twist={}'.format(twist[o]), alpha=.9, lw=lws[o] )            
     
-    ax2 = suppfig6.add_subplot(2,3,o+4)
+    ax2 = suppfig4.add_subplot(2,3,o+4)
     ax2.plot(x_osc, y_osc, c=colors2[o])
     ax2.plot(x_osc[0:int(len(t)/5)], y_osc[0:int(len(t)/5)], c='k', lw=.75)
     ax2.set_xlim([-1.8, 1.8]); ax2.set_ylim([-1.8, 1.8])
@@ -281,7 +281,7 @@ ax.set_xlabel('time (days)')
 ax.set_ylabel('$x$ concentration')
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
-suppfig6.subplots_adjust(
+suppfig4.subplots_adjust(
     top=0.88,
     bottom=0.135,
     left=0.075,
@@ -296,7 +296,7 @@ suppfig6.subplots_adjust(
 isExist = os.path.exists('./figures/')
 if not isExist:  
     os.makedirs('./figures/')
-#fig7.savefig('./figures/fig7.pdf', format='pdf')
-#suppfig4.savefig('./figures/suppfig4.pdf', format='pdf') 
-#suppfig5.savefig('./figures/suppfig5.pdf', format='pdf') 
-#suppfig6.savefig('./figures/suppfig6.pdf', format='pdf')
+#fig9.savefig('./figures/fig9.pdf', format='pdf')
+#suppfig2.savefig('./figures/suppfig2.pdf', format='pdf') 
+#suppfig3.savefig('./figures/suppfig3.pdf', format='pdf') 
+#suppfig4.savefig('./figures/suppfig4.pdf', format='pdf')
