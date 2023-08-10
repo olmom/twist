@@ -7,7 +7,7 @@
 
 # twist
 
-This repository contains the reproducible code for the generation of data, analysis and figures in the manuscript "Are circadian amplitudes and periods correlated? A new twist in the story" ([preprint](https://www.biorxiv.org/content/10.1101/2023.05.17.541139v1)).
+This repository contains the reproducible code for the generation of data, analysis and figures in the manuscript "Are circadian amplitudes and periods correlated? A new twist in the story" ([preprint](https://www.biorxiv.org/content/10.1101/2023.05.17.541139v1)). The Supplementary Material of the manuscript is provided in this repository. 
 
 To execute this code:
 
