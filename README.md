@@ -1,13 +1,13 @@
 <!-- badges: start -->
 <!--<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE205155"><img src="https://img.shields.io/badge/Data-GSE205155-green.svg?style=plastic" alt="" /></a>-->
 <!--[![](https://img.shields.io/badge/Data-10.1101/2022.06.03.494693-blue.svg)](https://doi.org/10.1101/2022.06.03.494693)-->
-[![](https://img.shields.io/badge/Preprint-10.1101/2023.02.12.528191-yellow.svg)](https://www.biorxiv.org/content/10.1101/2023.05.17.541139v1)
+[![](https://img.shields.io/badge/Publication-10.12688/f1000research.135533.1-yellow.svg)](https://f1000research.com/articles/12-1077/v1)
 <!--[![](https://img.shields.io/badge/Data-10.1101/2022.06.03.494693-blue.svg)](https://doi.org/10.1101/2022.06.03.494693)-->
  <!-- badges: end -->
 
 # twist
 
-This repository contains the reproducible code for the generation of data, analysis and figures in the manuscript "Are circadian amplitudes and periods correlated? A new twist in the story" ([preprint](https://www.biorxiv.org/content/10.1101/2023.05.17.541139v1)). The Supplementary Material of the manuscript is provided in this repository as *Supplementary_Material.pdf*. 
+This repository contains the reproducible code for the generation of data, analysis and figures in the manuscript "Are circadian amplitudes and periods correlated? A new twist in the story" ([publication](https://f1000research.com/articles/12-1077/v1)). The Supplementary Material of the manuscript is provided in this repository as *Supplementary_Material.pdf*. 
 
 To execute this code:
 
