@@ -246,7 +246,7 @@ pulse = .7
 #####################################################
 
 t = np.arange(0, total_days*24, dt)
-fig8 = plt.figure(figsize=(11,6))
+fig8 = plt.figure(figsize=(11,7.5))
 
 for i in range(len(amplitude_rr)):
      # construct Poincare Oscillator
@@ -257,8 +257,9 @@ for i in range(len(amplitude_rr)):
         tau = 24
     )   
 
-    ax1 = fig8.add_subplot(2,3,i+1) #phase spaces
-    ax2 = fig8.add_subplot(2,3,i+4) 
+    ax1 = fig8.add_subplot(3,3,i+1) #phase spaces
+    ax2 = fig8.add_subplot(3,3,i+4) 
+    ax3 = fig8.add_subplot(3,3,i+7) 
     ax1.set_xlim([-1.6,1.6]); ax1.set_ylim([-1.6, 1.6])
     ax1.set_aspect(1.0/ax1.get_data_ratio(), adjustable='box')
 
@@ -304,16 +305,28 @@ for i in range(len(amplitude_rr)):
         t_max_pert = t[idx_max_pert]
         phase_shift = t_max_pert[-1] - t_max_ctrl[-1]
         phase_shifts.append(phase_shift)
+        
+        if j == 6:
+            peak_trough = x_max_pert[0:6] - x_min_pert[0:6] 
+            peak_peak = np.diff(t_max_pert)  
+
     phase_shifts = np.asarray(phase_shifts)
     phase_shifts[phase_shifts < -12] += 24
     phase_shifts[phase_shifts > 12] -= 24
 
-    ax2.axhline(y=0, linestyle='--', color='grey', lw=0.5)
-    ax2.plot(phase_perturbation, phase_shifts, 
+    ax2.plot(peak_peak[1:6], peak_trough[1:6], '--', color='crimson')
+    ax2.plot(peak_peak[1:6], peak_trough[1:6], 'o', color='crimson')
+    ax2.set_xlabel('peak-to-peak distance (h)')
+    ax2.set_ylabel('peak-to-trough\ndistance (a.u.)')
+    ax2.set_xlim([23.5, 24.5])
+    ax2.set_aspect(0.66/ax2.get_data_ratio(), adjustable='box')
+
+    ax3.axhline(y=0, linestyle='--', color='grey', lw=0.5)
+    ax3.plot(phase_perturbation, phase_shifts, 
              'k-', markersize=2)
-    ax2.set_xlabel('circadian time CT'); ax2.set_ylabel('phase shift (h)')
-    ax2.set_xticks([0,6,12,18,24]); ax2.set_yticks([-12,-6,0,6,12]) 
-    ax2.set_aspect(0.75/ax2.get_data_ratio(), adjustable='box')
+    ax3.set_xlabel('circadian time CT'); ax3.set_ylabel('phase shift (h)')
+    ax3.set_xticks([0,6,12,18,24]); ax3.set_yticks([-12,-6,0,6,12]) 
+    ax3.set_aspect(0.66/ax3.get_data_ratio(), adjustable='box')
 
 
 fig8.subplots_adjust(top=0.88,
