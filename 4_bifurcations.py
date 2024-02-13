@@ -1,6 +1,7 @@
 from pylab import*
 import pandas as pd
 import seaborn as sns
+from sklearn.linear_model import LinearRegression
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.size'] = '13'
 plt.rcParams['legend.fontsize'] = '12'
@@ -26,23 +27,33 @@ print(data.keys())
 # panel A
 subplot(131)
 subset=data.loc[data[0]==1]
-scatter(subset[3], subset[6], s=2, color="k")
+x1, stFP = subset[3].values.reshape(-1,1), subset[6].values
+model1 = LinearRegression()
+model1.fit(x1, stFP)
+scatter(subset[3], stFP/stFP, s=2, color="k")
+
 subset2=data.loc[data[0]==2]
-scatter(subset2[3].values[1:], subset2[6].values[1:], s=2, color="gray")
+x2, ustFP = subset2[3].values[1:].reshape(-1,1), subset2[6].values[1:]
+model2 = LinearRegression()
+model2.fit(x2, ustFP)
+scatter(subset2[3].values[1:], ustFP/ustFP, s=2, color="gray")
+
 subset3=data.loc[data[0]==3]
-plot(subset3[3], subset3[6], lw=3.5, color=colors[1])
-plot(subset3[3], subset3[9], lw=3.5, color=colors[1])
+unstFP_fit = model2.predict(subset3[3].values.reshape(-1,1)) 
+max_norm, min_norm = subset3[6]/unstFP_fit, subset3[9]/unstFP_fit
+plot(subset3[3], max_norm, lw=3.5, color=colors[1])
+plot(subset3[3], min_norm, lw=3.5, color=colors[1])
 
 idx = np.where(subset3[3].values[1:] < 0.35)[0][0]
-plot(subset3[3].values[idx], subset3[6].values[idx], marker='*',
+plot(subset3[3].values[idx], max_norm.values[idx], marker='*',
         color="k", markersize=15)
-plot(subset3[3].values[idx], subset3[9].values[idx], marker='*', 
+plot(subset3[3].values[idx], min_norm.values[idx], marker='*', 
         color="k", markersize=15)
 
 xlabel("$k_4$ (nM/h)")
 ylabel("$x$min,max")
 xlim(0.15,0.5)
-ylim(0.00, 0.240)
+ylim(0.40, 1.60)
 
 # panel B
 subplot(132)
@@ -54,8 +65,8 @@ ylabel("period (h)")
 
 # panel C
 subplot(133)
-plot(subset3[5],  subset3[6]-subset3[9], lw=3.5, color=colors[1])
-plot(subset3[5].values[idx], subset3[6].values[idx]-subset3[9].values[idx],
+plot(subset3[5],  max_norm-min_norm, lw=3.5, color=colors[1])
+plot(subset3[5].values[idx], max_norm.values[idx]-min_norm.values[idx],
      marker='*', color="k", markersize=15)
 ylabel("$x$max $-x$min")
 xlabel("period (h)")
